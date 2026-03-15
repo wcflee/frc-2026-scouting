@@ -5,6 +5,7 @@ const FILES_TO_CACHE = [
   "./styles.css",
   "./app.js",
   "./qrcode.min.js",
+  "./manifest.json",
   "https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"
 ];
 
