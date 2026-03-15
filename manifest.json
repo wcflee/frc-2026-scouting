@@ -1,0 +1,9 @@
+{
+  "name": "FRC Scouting App",
+  "short_name": "Scouting",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0033cc",
+  "icons": []
+}

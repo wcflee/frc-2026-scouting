@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FRC Match Scouting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* Protect QR from being stretched by any layout/CSS */
+    #qrcode {
+      display: inline-block;
+      padding: 0;
+      margin: 0;
+      text-align: center;
+    }
+
+    #qrcode img,
+    #qrcode canvas {
+      width: auto !important;
+      height: auto !important;
+      image-rendering: pixelated;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Progress bar -->
+    <div id="progress">
+      <span class="step active">Setup</span>
+      <span class="step">Auto</span>
+      <span class="step">Tele</span>
+      <span class="step">Endgame</span>
+      <span class="step">Tags</span>
+      <span class="step">QR</span>
+    </div>
+
+    <!-- Setup Screen -->
+    <div id="screen-setup" class="screen active">
+      <h1>Match Setup</h1>
+
+      <label>Match Number</label>
+      <div class="row">
+        <button type="button" class="btn-small" id="match-dec">-</button>
+        <input type="number" id="match-number" />
+        <button type="button" class="btn-small" id="match-inc">+</button>
+      </div>
+
+      <label>Team Number</label>
+      <input type="number" id="team-number" />
+
+      <label>Alliance</label>
+      <div class="row">
+        <button type="button" class="toggle" data-value="red" id="alliance-red">Red</button>
+        <button type="button" class="toggle" data-value="blue" id="alliance-blue">Blue</button>
+      </div>
+
+      <label>Scout Name</label>
+      <input type="text" id="scout-name" />
+
+      <div class="nav">
+        <button type="button" id="setup-next" class="primary">Next →</button>
+      </div>
+    </div>
+
+    <!-- Auto Screen -->
+    <div id="screen-auto" class="screen">
+      <h1>Autonomous</h1>
+
+      <label>Auto Contribution %</label>
+      <p class="hint">What % of alliance AUTO balls did this robot score?</p>
+      <input type="range" id="auto-contrib" min="0" max="100" step="5" />
+      <div class="value-display"><span id="auto-contrib-value">0</span>%</div>
+
+      <label>Taxi / Mobility</label>
+      <div class="row">
+        <button type="button" class="toggle" data-field="auto-taxi" data-value="true">Yes</button>
+        <button type="button" class="toggle" data-field="auto-taxi" data-value="false">No</button>
+      </div>
+
+      <label>Auto Climb</label>
+      <div class="row">
+        <button type="button" class="toggle" data-field="auto-climb" data-value="true">Yes</button>
+        <button type="button" class="toggle" data-field="auto-climb" data-value="false">No</button>
+      </div>
+
+      <label>Penalties</label>
+      <div class="row">
+        <button type="button" class="toggle" data-field="auto-penalties" data-value="true">Yes</button>
+        <button type="button" class="toggle" data-field="auto-penalties" data-value="false">No</button>
+      </div>
+
+      <label>Disabled</label>
+      <div class="row">
+        <button type="button" class="toggle" data-field="auto-disabled" data-value="true">Yes</button>
+        <button type="button" class="toggle" data-field="auto-disabled" data-value="false">No</button>
+      </div>
+
+      <div class="nav">
+        <button type="button" class="secondary" data-back="setup">← Back</button>
+        <button type="button" class="primary" data-next="tele">Next →</button>
+      </div>
+    </div>
+
+    <!-- Teleop Screen -->
+    <div id="screen-tele" class="screen">
+      <h1>Teleop</h1>
+
+      <label>Teleop Contribution %</label>
+      <p class="hint">What % of alliance TELEOP balls did this robot score?</p>
+      <input type="range" id="tele-contrib" min="0" max="100" step="5" />
+      <div class="value-display"><span id="tele-contrib-value">0</span>%</div>
+
+      <label>Defense Played</label>
+      <div class="row">
+        <button type="button" class="toggle" data-field="tele-defense" data-value="none">None</button>
+        <button type="button" class="toggle" data-field="tele-defense" data-value="light">Light</button>
+        <button type="button" class="toggle" data-field="tele-defense" data-value="moderate">Moderate</button>
+        <button type="button" class="toggle" data-field="tele-defense" data-value="heavy">Heavy</button>
+      </div>
+
+      <label>Penalties</label>
+      <div class="row">
+        <button type="button" class="toggle" data-field="tele-penalties" data-value="true">Yes</button>
+        <button type="button" class="toggle" data-field="tele-penalties" data-value="false">No</button>
+      </div>
+
+      <label>Disabled</label>
+      <div class="row">
+        <button type="button" class="toggle" data-field="tele-disabled" data-value="true">Yes</button>
+        <button type="button" class="toggle" data-field="tele-disabled" data-value="false">No</button>
+      </div>
+
+      <div class="nav">
+        <button type="button" class="secondary" data-back="auto">← Back</button>
+        <button type="button" class="primary" data-next="endgame">Next →</button>
+      </div>
+    </div>
+
+    <!-- Endgame Screen -->
+    <div id="screen-endgame" class="screen">
+      <h1>Endgame</h1>
+
+      <label>Teleop Climb</label>
+      <div class="row">
+        <button type="button" class="toggle" data-field="endgame-climb" data-value="none">None</button>
+        <button type="button" class="toggle" data-field="endgame-climb" data-value="attempted">Attempted</button>
+        <button type="button" class="toggle" data-field="endgame-climb" data-value="successful">Successful</button>
+      </div>
+
+      <label>Climb Time (seconds)</label>
+      <input type="number" id="climb-time" min="0" />
+
+      <div class="nav">
+        <button type="button" class="secondary" data-back="tele">← Back</button>
+        <button type="button" class="primary" data-next="tags">Next →</button>
+      </div>
+    </div>
+
+    <!-- Tags Screen -->
+    <div id="screen-tags" class="screen">
+      <h1>Quick Tags</h1>
+      <p class="hint">Tap all that apply.</p>
+
+      <div class="tag-grid">
+        <button type="button" class="tag" data-tag="good_intake">Good Intake</button>
+        <button type="button" class="tag" data-tag="weak_intake">Weak Intake</button>
+        <button type="button" class="tag" data-tag="fast_cycle">Fast Cycle</button>
+        <button type="button" class="tag" data-tag="slow_cycle">Slow Cycle</button>
+        <button type="button" class="tag" data-tag="good_driver">Good Driver</button>
+        <button type="button" class="tag" data-tag="unstable">Unstable</button>
+        <button type="button" class="tag" data-tag="dead_robot">Dead Robot</button>
+      </div>
+
+      <div class="nav">
+        <button type="button" class="secondary" data-back="endgame">← Back</button>
+        <button type="button" class="primary" id="generate-qr">Generate QR →</button>
+      </div>
+    </div>
+
+    <!-- QR Screen -->
+    <div id="screen-qr" class="screen">
+      <h1>Export Data</h1>
+      <p>Have the lead scout scan this QR code to submit your match data.</p>
+
+      <div id="qrcode"></div>
+
+      <!-- SHARE BUTTONS (Email, SMS, Copy only) -->
+      <div class="send-buttons">
+        <button id="send-email">Send via Email</button>
+        <button id="send-sms">Send via Text</button>
+        <button id="copy-qr">Copy to Clipboard</button>
+      </div>
+
+      <div class="nav">
+        <button type="button" class="primary" id="new-match">Done / New Match</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+  <script src="app.js"></script>
+
+  <!-- Register Service Worker for Offline Support -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js");
+    }
+  </script>
+</body>
+</html>
