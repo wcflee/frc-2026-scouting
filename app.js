@@ -1,369 +1,228 @@
-// Basic state
+// Global state
 let state = {
-  match_number: 1,
-  team_number: null,
-  alliance: null,
-  scout_name: "",
-  auto: {
-    contribution_percent: 0,
-    taxi: false,
-    auto_climb: false,
-    penalties: false,
-    disabled: false
-  },
-  teleop: {
-    contribution_percent: 0,
-    defense_played: "none",
-    penalties: false,
-    disabled: false
-  },
-  endgame: {
-    teleop_climb: "none",
-    climb_time_seconds: null
-  },
-  tags: {
-    good_intake: false,
-    weak_intake: false,
-    fast_cycle: false,
-    slow_cycle: false,
-    good_driver: false,
-    unstable: false,
-    dead_robot: false
-  },
-  timestamp: "",
-  device_id: ""
+  teamNumber: "",
+  matchNumber: "",
+  scoutName: "",
+  autoMoved: false,
+  autoNotes: "",
+  teleopScored: 0,
+  defenseLevel: "none",
+  tags: [],
+  comments: "",
+  qrSent: false,
+  qrData: ""
 };
 
-function $(id) {
-  return document.getElementById(id);
+function showPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
 
-function showScreen(name) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.querySelectorAll("#progress .step").forEach(s => s.classList.remove("active"));
+// Setup listeners
+window.addEventListener("DOMContentLoaded", () => {
+  // Initial page
+  showPage("page-setup");
 
-  const screenId = `screen-${name}`;
-  $(screenId).classList.add("active");
+  // Setup page
+  document.getElementById("to-auto").addEventListener("click", () => {
+    state.teamNumber = document.getElementById("teamNumber").value.trim();
+    state.matchNumber = document.getElementById("matchNumber").value.trim();
+    state.scoutName = document.getElementById("scoutName").value.trim();
 
-  const order = ["setup", "auto", "tele", "endgame", "tags", "qr"];
-  const idx = order.indexOf(name);
-  if (idx >= 0) {
-    document.querySelectorAll("#progress .step")[idx].classList.add("active");
-  }
-
-  saveToLocal();
-}
-
-function saveToLocal() {
-  try {
-    localStorage.setItem("frc_scout_state", JSON.stringify(state));
-  } catch (e) {}
-}
-
-function loadFromLocal() {
-  try {
-    const raw = localStorage.getItem("frc_scout_state");
-    if (!raw) return;
-    const s = JSON.parse(raw);
-    state = s;
-  } catch (e) {}
-}
-
-function initSetupScreen() {
-  $("match-number").value = state.match_number;
-  $("team-number").value = state.team_number || "";
-  $("scout-name").value = state.scout_name || "";
-
-  if (state.alliance === "red") {
-    $("alliance-red").classList.add("active");
-  } else if (state.alliance === "blue") {
-    $("alliance-blue").classList.add("active");
-  }
-
-  $("match-inc").onclick = () => {
-    state.match_number = (parseInt($("match-number").value) || 0) + 1;
-    $("match-number").value = state.match_number;
-    saveToLocal();
-  };
-  $("match-dec").onclick = () => {
-    state.match_number = Math.max(1, (parseInt($("match-number").value) || 1) - 1);
-    $("match-number").value = state.match_number;
-    saveToLocal();
-  };
-
-  $("alliance-red").onclick = () => {
-    state.alliance = "red";
-    $("alliance-red").classList.add("active");
-    $("alliance-blue").classList.remove("active");
-    saveToLocal();
-  };
-  $("alliance-blue").onclick = () => {
-    state.alliance = "blue";
-    $("alliance-blue").classList.add("active");
-    $("alliance-red").classList.remove("active");
-    saveToLocal();
-  };
-
-  $("match-number").onchange = () => {
-    state.match_number = parseInt($("match-number").value) || 1;
-    saveToLocal();
-  };
-  $("team-number").onchange = () => {
-    state.team_number = parseInt($("team-number").value) || null;
-    saveToLocal();
-  };
-  $("scout-name").onchange = () => {
-    state.scout_name = $("scout-name").value;
-    saveToLocal();
-  };
-
-  $("setup-next").onclick = () => {
-    if (!state.match_number || !state.team_number || !state.alliance || !state.scout_name) {
-      alert("Please fill all fields.");
+    if (!state.teamNumber || !state.matchNumber) {
+      alert("Please enter team number and match number.");
       return;
     }
-    showScreen("auto");
-  };
-}
 
-function initAutoScreen() {
-  const slider = $("auto-contrib");
-  const valueSpan = $("auto-contrib-value");
-  slider.value = state.auto.contribution_percent || 0;
-  valueSpan.textContent = slider.value;
-
-  slider.oninput = () => {
-    state.auto.contribution_percent = parseInt(slider.value);
-    valueSpan.textContent = slider.value;
-    saveToLocal();
-  };
-
-  document.querySelectorAll('[data-field="auto-taxi"]').forEach(btn => {
-    btn.onclick = () => {
-      state.auto.taxi = btn.dataset.value === "true";
-      setToggleGroup("auto-taxi", btn.dataset.value);
-    };
-  });
-  document.querySelectorAll('[data-field="auto-climb"]').forEach(btn => {
-    btn.onclick = () => {
-      state.auto.auto_climb = btn.dataset.value === "true";
-      setToggleGroup("auto-climb", btn.dataset.value);
-    };
-  });
-  document.querySelectorAll('[data-field="auto-penalties"]').forEach(btn => {
-    btn.onclick = () => {
-      state.auto.penalties = btn.dataset.value === "true";
-      setToggleGroup("auto-penalties", btn.dataset.value);
-    };
-  });
-  document.querySelectorAll('[data-field="auto-disabled"]').forEach(btn => {
-    btn.onclick = () => {
-      state.auto.disabled = btn.dataset.value === "true";
-      setToggleGroup("auto-disabled", btn.dataset.value);
-    };
+    showPage("page-auto");
   });
 
-  document.querySelector('#screen-auto [data-back="setup"]').onclick = () => showScreen("setup");
-  document.querySelector('#screen-auto [data-next="tele"]').onclick = () => showScreen("tele");
-}
-
-function initTeleScreen() {
-  const slider = $("tele-contrib");
-  const valueSpan = $("tele-contrib-value");
-  slider.value = state.teleop.contribution_percent || 0;
-  valueSpan.textContent = slider.value;
-
-  slider.oninput = () => {
-    state.teleop.contribution_percent = parseInt(slider.value);
-    valueSpan.textContent = slider.value;
-    saveToLocal();
-  };
-
-  document.querySelectorAll('[data-field="tele-defense"]').forEach(btn => {
-    btn.onclick = () => {
-      state.teleop.defense_played = btn.dataset.value;
-      setToggleGroup("tele-defense", btn.dataset.value);
-    };
-  });
-  document.querySelectorAll('[data-field="tele-penalties"]').forEach(btn => {
-    btn.onclick = () => {
-      state.teleop.penalties = btn.dataset.value === "true";
-      setToggleGroup("tele-penalties", btn.dataset.value);
-    };
-  });
-  document.querySelectorAll('[data-field="tele-disabled"]').forEach(btn => {
-    btn.onclick = () => {
-      state.teleop.disabled = btn.dataset.value === "true";
-      setToggleGroup("tele-disabled", btn.dataset.value);
-    };
+  // Auto page
+  document.getElementById("back-to-setup").addEventListener("click", () => {
+    showPage("page-setup");
   });
 
-  document.querySelector('#screen-tele [data-back="auto"]').onclick = () => showScreen("auto");
-  document.querySelector('#screen-tele [data-next="endgame"]').onclick = () => showScreen("endgame");
-}
-
-function initEndgameScreen() {
-  document.querySelectorAll('[data-field="endgame-climb"]').forEach(btn => {
-    btn.onclick = () => {
-      state.endgame.teleop_climb = btn.dataset.value;
-      setToggleGroup("endgame-climb", btn.dataset.value);
-      saveToLocal();
-    };
+  document.getElementById("to-teleop").addEventListener("click", () => {
+    state.autoMoved = document.getElementById("autoMoved").checked;
+    state.autoNotes = document.getElementById("autoNotes").value.trim();
+    showPage("page-teleop");
   });
 
-  $("climb-time").value = state.endgame.climb_time_seconds || "";
-  $("climb-time").onchange = () => {
-    const v = $("climb-time").value;
-    state.endgame.climb_time_seconds = v === "" ? null : parseInt(v);
-    saveToLocal();
-  };
-
-  document.querySelector('#screen-endgame [data-back="tele"]').onclick = () => showScreen("tele");
-  document.querySelector('#screen-endgame [data-next="tags"]').onclick = () => showScreen("tags");
-}
-
-function initTagsScreen() {
-  document.querySelectorAll(".tag").forEach(btn => {
-    const tag = btn.dataset.tag;
-    if (state.tags[tag]) btn.classList.add("active");
-
-    btn.onclick = () => {
-      state.tags[tag] = !state.tags[tag];
-      btn.classList.toggle("active");
-      saveToLocal();
-    };
+  // Teleop page
+  document.getElementById("back-to-auto").addEventListener("click", () => {
+    showPage("page-auto");
   });
 
-  document.querySelector('#screen-tags [data-back="endgame"]').onclick = () => showScreen("endgame");
-  $("generate-qr").onclick = () => {
+  document.getElementById("to-tags").addEventListener("click", () => {
+    const teleopScored = parseInt(document.getElementById("teleopScored").value || "0", 10);
+    state.teleopScored = isNaN(teleopScored) ? 0 : teleopScored;
+
+    const defenseRadios = document.querySelectorAll("input[name='defenseLevel']");
+    defenseRadios.forEach(r => {
+      if (r.checked) state.defenseLevel = r.value;
+    });
+
+    showPage("page-tags");
+  });
+
+  // Tags page
+  document.getElementById("back-to-teleop").addEventListener("click", () => {
+    showPage("page-teleop");
+  });
+
+  const commentsEl = document.getElementById("comments");
+  const commentsCounter = document.getElementById("comments-counter");
+  commentsEl.addEventListener("input", () => {
+    const len = commentsEl.value.length;
+    commentsCounter.textContent = `${len} / 300`;
+  });
+
+  document.getElementById("to-qr").addEventListener("click", () => {
+    const tagCheckboxes = document.querySelectorAll(".tag-checkbox");
+    state.tags = [];
+    tagCheckboxes.forEach(cb => {
+      if (cb.checked) state.tags.push(cb.value);
+    });
+
+    state.comments = commentsEl.value.trim();
+
     generateQR();
-    showScreen("qr");
-  };
-}
-
-function setToggleGroup(field, value) {
-  document.querySelectorAll(`[data-field="${field}"]`).forEach(btn => {
-    if (btn.dataset.value === value) btn.classList.add("active");
-    else btn.classList.remove("active");
+    resetEmailState();
+    showPage("page-qr");
   });
-  saveToLocal();
-}
 
-//
-// ⭐ COMPRESSED QR VERSION + SHARE OPTIONS
-//
-function generateQR() {
-  state.timestamp = new Date().toISOString();
-  if (!state.device_id) {
-    state.device_id = "device-" + Math.random().toString(36).slice(2, 10);
+  // QR page
+  document.getElementById("back-to-tags").addEventListener("click", () => {
+    showPage("page-tags");
+  });
+
+  document.getElementById("send-email").addEventListener("click", () => {
+    sendEmailWithQR();
+  });
+
+  document.getElementById("done-match").addEventListener("click", () => {
+    if (!state.qrSent) {
+      alert("Please send the email before completing the match.");
+      return;
+    }
+    resetForNewMatch();
+    showPage("page-setup");
+  });
+
+  // Register service worker
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./service-worker.js").catch(console.error);
   }
-  saveToLocal();
+});
 
+function generateQR() {
   const payload = {
-    match_number: state.match_number,
-    team_number: state.team_number,
-    alliance: state.alliance,
-    scout_name: state.scout_name,
-    auto: state.auto,
-    teleop: state.teleop,
-    endgame: state.endgame,
+    teamNumber: state.teamNumber,
+    matchNumber: state.matchNumber,
+    scoutName: state.scoutName,
+    autoMoved: state.autoMoved,
+    autoNotes: state.autoNotes,
+    teleopScored: state.teleopScored,
+    defenseLevel: state.defenseLevel,
     tags: state.tags,
-    timestamp: state.timestamp,
-    device_id: state.device_id
+    comments: state.comments
+    // alliance intentionally omitted for now
   };
 
   const json = JSON.stringify(payload);
   const compressed = LZString.compressToEncodedURIComponent(json);
+  state.qrData = compressed;
 
-  const qrContainer = $("qrcode");
+  const qrContainer = document.getElementById("qrcode");
   qrContainer.innerHTML = "";
-
   new QRCode(qrContainer, {
     text: compressed,
-    width: 512,
-    height: 512,
-    correctLevel: QRCode.CorrectLevel.H,
-    typeNumber: 20
+    width: 256,
+    height: 256
+  });
+}
+
+function resetEmailState() {
+  state.qrSent = false;
+  const sendBtn = document.getElementById("send-email");
+  const doneBtn = document.getElementById("done-match");
+  const status = document.getElementById("email-status");
+
+  sendBtn.classList.remove("sent");
+  sendBtn.disabled = false;
+  sendBtn.textContent = "Send via Email";
+  doneBtn.disabled = true;
+  status.textContent = "";
+}
+
+function sendEmailWithQR() {
+  if (!state.qrData) {
+    alert("QR data not generated yet.");
+    return;
+  }
+
+  const subject = encodeURIComponent(
+    `Scouting Data - Team ${state.teamNumber} - Match ${state.matchNumber}`
+  );
+  const bodyLines = [
+    `Team: ${state.teamNumber}`,
+    `Match: ${state.matchNumber}`,
+    `Scout: ${state.scoutName}`,
+    "",
+    "QR Data (compressed):",
+    state.qrData
+  ];
+  const body = encodeURIComponent(bodyLines.join("\n"));
+
+  const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
+  window.location.href = mailtoLink;
+
+  state.qrSent = true;
+  const sendBtn = document.getElementById("send-email");
+  const doneBtn = document.getElementById("done-match");
+  const status = document.getElementById("email-status");
+
+  sendBtn.classList.add("sent");
+  sendBtn.disabled = true;
+  sendBtn.textContent = "Sent";
+  doneBtn.disabled = false;
+  status.textContent = "Email sent — you may continue.";
+}
+
+function resetForNewMatch() {
+  state = {
+    teamNumber: "",
+    matchNumber: "",
+    scoutName: "",
+    autoMoved: false,
+    autoNotes: "",
+    teleopScored: 0,
+    defenseLevel: "none",
+    tags: [],
+    comments: "",
+    qrSent: false,
+    qrData: ""
+  };
+
+  document.getElementById("teamNumber").value = "";
+  document.getElementById("matchNumber").value = "";
+  document.getElementById("scoutName").value = "";
+  document.getElementById("autoMoved").checked = false;
+  document.getElementById("autoNotes").value = "";
+  document.getElementById("teleopScored").value = "";
+
+  document.querySelectorAll("input[name='defenseLevel']").forEach(r => {
+    r.checked = r.value === "none";
   });
 
-  //
-  // ⭐ SHARE BUTTONS (Email, SMS, Copy only)
-  //
+  document.querySelectorAll(".tag-checkbox").forEach(cb => {
+    cb.checked = false;
+  });
 
-  // EMAIL (default recipient)
-  $("send-email").onclick = () => {
-    const subject = encodeURIComponent("Scouting QR Code");
-    const body = encodeURIComponent("Scouting QR:\n\n" + compressed);
-    window.location.href = `mailto:wcflee@yahoo.com?subject=${subject}&body=${body}`;
-  };
+  const commentsEl = document.getElementById("comments");
+  commentsEl.value = "";
+  document.getElementById("comments-counter").textContent = "0 / 300";
 
-  // SMS
-  $("send-sms").onclick = () => {
-    const body = encodeURIComponent("Scouting QR:\n" + compressed);
-    window.location.href = `sms:?body=${body}`;
-  };
-
-  // COPY TO CLIPBOARD (with fallback)
-  $("copy-qr").onclick = async () => {
-    try {
-      await navigator.clipboard.writeText(compressed);
-      alert("QR data copied to clipboard!");
-    } catch (err) {
-      const temp = document.createElement("textarea");
-      temp.value = compressed;
-      document.body.appendChild(temp);
-      temp.select();
-      document.execCommand("copy");
-      document.body.removeChild(temp);
-      alert("QR data copied (fallback mode)!");
-    }
-  };
+  document.getElementById("qrcode").innerHTML = "";
+  document.getElementById("email-status").textContent = "";
 }
-
-function initQRScreen() {
-  $("new-match").onclick = () => {
-    state.match_number = state.match_number + 1;
-    state.team_number = null;
-    state.auto = {
-      contribution_percent: 0,
-      taxi: false,
-      auto_climb: false,
-      penalties: false,
-      disabled: false
-    };
-    state.teleop = {
-      contribution_percent: 0,
-      defense_played: "none",
-      penalties: false,
-      disabled: false
-    };
-    state.endgame = {
-      teleop_climb: "none",
-      climb_time_seconds: null
-    };
-    state.tags = {
-      good_intake: false,
-      weak_intake: false,
-      fast_cycle: false,
-      slow_cycle: false,
-      good_driver: false,
-      unstable: false,
-      dead_robot: false
-    };
-
-    saveToLocal();
-    showScreen("setup");
-    initSetupScreen();
-  };
-}
-
-window.onload = () => {
-  loadFromLocal();
-  initSetupScreen();
-  initAutoScreen();
-  initTeleScreen();
-  initEndgameScreen();
-  initTagsScreen();
-  initQRScreen();
-  showScreen("setup");
-};
