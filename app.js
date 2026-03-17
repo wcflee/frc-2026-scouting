@@ -214,7 +214,7 @@ function sendEmailWithQR() {
     `Team: ${state.teamNumber}\nMatch: ${state.matchNumber}\nScout: ${state.scoutName}\n\nQR Data:\n${state.qrData}`
   );
 
-  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  window.location.href = `mailto:wcflee@yahoo.com?subject=${subject}&body=${body}`;
 
   state.qrSent = true;
 
