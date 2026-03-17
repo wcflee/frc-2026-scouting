@@ -33,7 +33,7 @@ function showPage(id) {
 window.addEventListener("DOMContentLoaded", () => {
   showPage("page-setup");
 
-  // Setup
+  // SETUP PAGE
   document.getElementById("to-auto").addEventListener("click", () => {
     state.teamNumber = document.getElementById("teamNumber").value.trim();
     state.matchNumber = document.getElementById("matchNumber").value.trim();
@@ -51,7 +51,7 @@ window.addEventListener("DOMContentLoaded", () => {
     showPage("page-setup");
   });
 
-  // Auto slider
+  // AUTO SLIDER
   const autoSlider = document.getElementById("autoContribution");
   const autoValue = document.getElementById("autoContributionValue");
   autoSlider.addEventListener("input", () => {
@@ -68,7 +68,7 @@ window.addEventListener("DOMContentLoaded", () => {
     showPage("page-teleop");
   });
 
-  // Teleop slider
+  // TELEOP SLIDER
   const teleopSlider = document.getElementById("teleopContribution");
   const teleopValue = document.getElementById("teleopContributionValue");
   teleopSlider.addEventListener("input", () => {
@@ -92,7 +92,7 @@ window.addEventListener("DOMContentLoaded", () => {
     showPage("page-endgame");
   });
 
-  // Endgame
+  // ENDGAME PAGE
   document.getElementById("back-to-teleop").addEventListener("click", () => {
     showPage("page-teleop");
   });
@@ -105,7 +105,7 @@ window.addEventListener("DOMContentLoaded", () => {
     showPage("page-tags");
   });
 
-  // Tags
+  // TAGS PAGE
   const commentsEl = document.getElementById("comments");
   const commentsCounter = document.getElementById("comments-counter");
   commentsEl.addEventListener("input", () => {
@@ -130,7 +130,7 @@ window.addEventListener("DOMContentLoaded", () => {
     showPage("page-qr");
   });
 
-  // QR page
+  // QR PAGE
   document.getElementById("back-to-tags").addEventListener("click", () => {
     showPage("page-tags");
   });
@@ -148,7 +148,7 @@ window.addEventListener("DOMContentLoaded", () => {
     showPage("page-setup");
   });
 
-  // Service worker
+  // SERVICE WORKER
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./service-worker.js").catch(console.error);
   }
@@ -242,4 +242,53 @@ function resetForNewMatch() {
     autoDisabled: "no",
 
     defenseLevel: "none",
-    teleopContribution:
+    teleopContribution: 0,
+    teleopPenalties: "no",
+    teleopDisabled: "no",
+
+    endgameClimb: "none",
+    endgamePenalties: "no",
+    endgameDisabled: "no",
+
+    tags: [],
+    comments: "",
+
+    qrSent: false,
+    qrData: ""
+  };
+
+  document.getElementById("teamNumber").value = "";
+  document.getElementById("matchNumber").value = "";
+  document.getElementById("scoutName").value = "";
+
+  document.getElementById("autoMoved").checked = false;
+  document.getElementById("autoContribution").value = 0;
+  document.getElementById("autoContributionValue").textContent = "0%";
+  document.getElementById("autoClimb").value = "no";
+  document.getElementById("autoPenalties").value = "no";
+  document.getElementById("autoDisabled").value = "no";
+
+  document.querySelectorAll("input[name='defenseLevel']").forEach(r => {
+    r.checked = r.value === "none";
+  });
+
+  document.getElementById("teleopContribution").value = 0;
+  document.getElementById("teleopContributionValue").textContent = "0%";
+  document.getElementById("teleopPenalties").value = "no";
+  document.getElementById("teleopDisabled").value = "no";
+
+  document.getElementById("endgameClimb").value = "none";
+  document.getElementById("endgamePenalties").value = "no";
+  document.getElementById("endgameDisabled").value = "no";
+
+  document.querySelectorAll(".tag-checkbox").forEach(cb => {
+    cb.checked = false;
+  });
+
+  const commentsEl = document.getElementById("comments");
+  commentsEl.value = "";
+  document.getElementById("comments-counter").textContent = "0 / 300";
+
+  document.getElementById("qrcode").innerHTML = "";
+  document.getElementById("email-status").textContent = "";
+}
