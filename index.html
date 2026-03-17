@@ -11,51 +11,77 @@
 </head>
 <body>
   <div id="app">
-    <!-- Match Setup -->
+
+    <!-- MATCH SETUP -->
     <section class="page" id="page-setup">
       <h1>Match Setup</h1>
+
       <label>
         Team Number
-        <input type="number" id="teamNumber" />
+        <input type="number" id="teamNumber">
       </label>
+
       <label>
         Match Number
-        <input type="number" id="matchNumber" />
+        <input type="number" id="matchNumber">
       </label>
+
       <label>
         Scout Name
-        <input type="text" id="scoutName" />
+        <input type="text" id="scoutName">
       </label>
-      <!-- Alliance selector removed -->
+
       <button id="to-auto" class="primary">Next: Auto</button>
     </section>
 
-    <!-- Auto -->
+    <!-- AUTO -->
     <section class="page" id="page-auto">
       <h1>Autonomous</h1>
+
       <label>
         Did they move?
-        <input type="checkbox" id="autoMoved" />
+        <input type="checkbox" id="autoMoved">
       </label>
+
       <label>
-        Auto Notes
-        <textarea id="autoNotes" rows="3"></textarea>
+        Auto % Contribution
+        <input type="range" id="autoContribution" min="0" max="100" value="0">
+        <span id="autoContributionValue">0%</span>
       </label>
+
+      <label>
+        Auto Climb Attempt?
+        <select id="autoClimb">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </label>
+
+      <label>
+        Auto Penalties?
+        <select id="autoPenalties">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </label>
+
+      <label>
+        Disabled in Auto?
+        <select id="autoDisabled">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </label>
+
       <div class="nav-row">
         <button class="secondary" id="back-to-setup">Back</button>
         <button class="primary" id="to-teleop">Next: Teleop</button>
       </div>
     </section>
 
-    <!-- Teleop -->
+    <!-- TELEOP -->
     <section class="page" id="page-teleop">
       <h1>Teleop</h1>
-
-      <!-- Example scoring fields (keep whatever you already had) -->
-      <label>
-        Teleop Scored (example)
-        <input type="number" id="teleopScored" min="0" />
-      </label>
 
       <fieldset>
         <legend>Did they play defense?</legend>
@@ -65,37 +91,98 @@
         <label><input type="radio" name="defenseLevel" value="heavy"> Heavy</label>
       </fieldset>
 
+      <label>
+        Teleop % Contribution
+        <input type="range" id="teleopContribution" min="0" max="100" value="0">
+        <span id="teleopContributionValue">0%</span>
+      </label>
+
+      <label>
+        Teleop Penalties?
+        <select id="teleopPenalties">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </label>
+
+      <label>
+        Disabled in Teleop?
+        <select id="teleopDisabled">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </label>
+
       <div class="nav-row">
         <button class="secondary" id="back-to-auto">Back</button>
-        <button class="primary" id="to-tags">Next: Tags</button>
+        <button class="primary" id="to-endgame">Next: Endgame</button>
       </div>
     </section>
 
-    <!-- Tags / Endgame -->
-    <section class="page" id="page-tags">
-      <h1>Tags & Comments</h1>
-
-      <!-- Example tags (keep whatever you already had) -->
-      <fieldset>
-        <legend>Tags</legend>
-        <label><input type="checkbox" class="tag-checkbox" value="reliable"> Reliable</label>
-        <label><input type="checkbox" class="tag-checkbox" value="fast"> Fast</label>
-        <label><input type="checkbox" class="tag-checkbox" value="defense-specialist"> Defense Specialist</label>
-      </fieldset>
+    <!-- ENDGAME -->
+    <section class="page" id="page-endgame">
+      <h1>Endgame</h1>
 
       <label>
-        Comments (optional, max 300 characters)
-        <textarea id="comments" rows="4" maxlength="300"></textarea>
-        <div id="comments-counter" class="counter">0 / 300</div>
+        Endgame Climb Level
+        <select id="endgameClimb">
+          <option value="none">No</option>
+          <option value="level1">Level 1</option>
+          <option value="level2">Level 2</option>
+          <option value="level3">Level 3</option>
+        </select>
+      </label>
+
+      <label>
+        Endgame Penalties?
+        <select id="endgamePenalties">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </label>
+
+      <label>
+        Disabled in Endgame?
+        <select id="endgameDisabled">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
       </label>
 
       <div class="nav-row">
         <button class="secondary" id="back-to-teleop">Back</button>
+        <button class="primary" id="to-tags">Next: Tags</button>
+      </div>
+    </section>
+
+    <!-- TAGS -->
+    <section class="page" id="page-tags">
+      <h1>Tags & Comments</h1>
+
+      <fieldset>
+        <legend>Tags</legend>
+        <label><input type="checkbox" class="tag-checkbox" value="good_intake"> Good Intake</label>
+        <label><input type="checkbox" class="tag-checkbox" value="weak_intake"> Weak Intake</label>
+        <label><input type="checkbox" class="tag-checkbox" value="fast_cycle"> Fast Cycle</label>
+        <label><input type="checkbox" class="tag-checkbox" value="slow_cycle"> Slow Cycle</label>
+        <label><input type="checkbox" class="tag-checkbox" value="good_driver"> Good Driver</label>
+        <label><input type="checkbox" class="tag-checkbox" value="unstable"> Unstable</label>
+        <label><input type="checkbox" class="tag-checkbox" value="dead_robot"> Dead Robot</label>
+      </fieldset>
+
+      <label>
+        Comments (optional, max 300 chars)
+        <textarea id="comments" maxlength="300"></textarea>
+        <div id="comments-counter" class="counter">0 / 300</div>
+      </label>
+
+      <div class="nav-row">
+        <button class="secondary" id="back-to-endgame">Back</button>
         <button class="primary" id="to-qr">Next: QR</button>
       </div>
     </section>
 
-    <!-- QR / Email -->
+    <!-- QR PAGE -->
     <section class="page" id="page-qr">
       <h1>QR & Email</h1>
 
@@ -104,15 +191,14 @@
 
       <div id="qrcode"></div>
 
-      <p class="hint">
-        After sending the email, you can complete this match and start a new one.
-      </p>
+      <p class="hint">After sending the email, you may complete this match.</p>
 
       <div class="nav-row">
         <button class="secondary" id="back-to-tags">Back</button>
         <button class="primary" id="done-match" disabled>Done / New Match</button>
       </div>
     </section>
+
   </div>
 
   <script src="app.js"></script>

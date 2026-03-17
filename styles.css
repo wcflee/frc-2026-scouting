@@ -21,16 +21,21 @@ body {
 
 label {
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 input[type="text"],
 input[type="number"],
-textarea {
+textarea,
+select {
   width: 100%;
-  box-sizing: border-box;
   padding: 8px;
   margin-top: 4px;
+  box-sizing: border-box;
+}
+
+input[type="range"] {
+  width: 100%;
 }
 
 .primary,
@@ -83,7 +88,6 @@ textarea {
   margin-top: 2px;
 }
 
-/* Sent state for email button */
 .primary.sent {
   background: #16a34a;
 }
