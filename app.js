@@ -184,6 +184,8 @@ function generateQR() {
     autoClimb: state.autoClimb,
     autoPenalties: state.autoPenalties,
     autoDisabled: state.autoDisabled,
+    teleopFeedCount: state.teleopFeedCount,
+
 
     defenseLevel: state.defenseLevel,
     teleopContribution: state.teleopContribution,
