@@ -67,6 +67,17 @@ window.addEventListener("DOMContentLoaded", () => {
     state.autoDisabled = document.getElementById("autoDisabled").value;
 
     showPage("page-teleop");
+
+    // ⭐ Attach feed button listeners NOW that Teleop page is visible ⭐
+    document.querySelectorAll(".feed-btn").forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll(".feed-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+
+        let val = btn.dataset.value;
+        state.teleopFeedCount = (val === "5") ? 5 : parseInt(val);
+      };
+    });
   });
 
   // TELEOP SLIDER
@@ -78,17 +89,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("back-to-auto").addEventListener("click", () => {
     showPage("page-auto");
-  });
-
-  // ⭐ TELEOP FEED BUTTONS — CORRECT LOCATION ⭐
-  document.querySelectorAll(".feed-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".feed-btn").forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-
-      let val = btn.dataset.value;
-      state.teleopFeedCount = (val === "5") ? 5 : parseInt(val);
-    });
   });
 
   document.getElementById("to-endgame").addEventListener("click", () => {
