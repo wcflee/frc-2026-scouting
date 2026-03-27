@@ -15,7 +15,6 @@ let state = {
   teleopDisabled: "no",
   teleopFeedCount: 0,
 
-
   endgameClimb: "none",
   endgamePenalties: "no",
   endgameDisabled: "no",
@@ -81,22 +80,16 @@ window.addEventListener("DOMContentLoaded", () => {
     showPage("page-auto");
   });
 
-  // TELEOP FEED BUTTONS
+  // ⭐ TELEOP FEED BUTTONS — CORRECT LOCATION ⭐
   document.querySelectorAll(".feed-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      // Clear previous selection
       document.querySelectorAll(".feed-btn").forEach(b => b.classList.remove("selected"));
-
-      // Mark selected
       btn.classList.add("selected");
 
-      // Save value
       let val = btn.dataset.value;
       state.teleopFeedCount = (val === "5") ? 5 : parseInt(val);
     });
   });
-
-
 
   document.getElementById("to-endgame").addEventListener("click", () => {
     const radios = document.querySelectorAll("input[name='defenseLevel']");
@@ -184,15 +177,12 @@ function generateQR() {
     autoClimb: state.autoClimb,
     autoPenalties: state.autoPenalties,
     autoDisabled: state.autoDisabled,
-    teleopFeedCount: state.teleopFeedCount,
-
 
     defenseLevel: state.defenseLevel,
     teleopContribution: state.teleopContribution,
     teleopPenalties: state.teleopPenalties,
     teleopDisabled: state.teleopDisabled,
     teleopFeedCount: state.teleopFeedCount,
-
 
     endgameClimb: state.endgameClimb,
     endgamePenalties: state.endgamePenalties,
@@ -269,7 +259,6 @@ function resetForNewMatch() {
     teleopPenalties: "no",
     teleopDisabled: "no",
     teleopFeedCount: 0,
-
 
     endgameClimb: "none",
     endgamePenalties: "no",
